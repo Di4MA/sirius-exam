@@ -1,0 +1,86 @@
+hostname BR-RTR.sirius-exam.org
+
+object-group network LOCAL
+  ip address-range 192.168.20.1-192.168.20.12
+exit
+object-group network PUBLIC
+  ip address-range 172.16.2.3-172.16.2.7
+exit
+
+syslog max-files 3
+syslog file-size 512
+syslog file tmpsys:syslog/default
+  severity info
+exit
+
+username admin
+  password encrypted $6$XBH2Q8sEsUst6Vw7$F88Ss4Sm3H/4U.uxAXO7b6.tm/Z6e2GLZ27ObiRZFc.6oEv2ZpT9uQfjTptHmvuxK2tVDcishCcKzHKvAAb6y0
+exit
+username net_admin
+  password encrypted $6$fK6dVCN5yZQxGhm7$HAV6/fFxVeYzdyvyid8PfsV7nwUlmpFK8m0jJTLcLQcGoK.PXQqkR6g99xzAon8VXIANXRmj05A5WstU2lnjV0
+  privilege 15
+exit
+
+domain lookup enable
+
+router ospf 10
+  area 1.1.1.1
+    network 192.168.20.0/28
+    network 10.10.10.0/28
+    enable
+  exit
+  enable
+exit
+
+interface gigabitethernet 1/0/1
+  ip firewall disable
+  ip address 192.168.20.1/28
+exit
+interface gigabitethernet 1/0/2
+  ip firewall disable
+  ip address 172.16.2.2/28
+  ip nat proxy-arp PUBLIC
+exit
+interface gigabitethernet 1/0/3
+  ip firewall disable
+  ip address 192.168.56.7/24
+exit
+
+tunnel gre 1
+  ip firewall disable
+  local address 172.16.2.2
+  remote address 172.16.1.2
+  ip address 10.10.10.2/28
+  ip ospf instance 10
+  ip ospf area 1.1.1.1
+  ip ospf
+  enable
+exit
+
+security passwords default-expired
+
+nat source
+  pool TRANSLATE
+    ip address-range 172.16.2.3-172.16.2.7
+  exit
+  ruleset Snat
+    to interface gigabitethernet 1/0/2
+    rule 1
+      match source-address object-group LOCAL
+      action source-nat pool TRANSLATE
+    exit
+  exit
+exit
+
+ip route 0.0.0.0/0 172.16.2.1
+
+ip ssh server
+
+clock timezone gmt +3
+
+ntp enable
+ntp broadcast-client enable
+
+licence-manager
+  host address elm.eltex-co.ru
+exit
