@@ -3,6 +3,8 @@ sudo docker load -i nex.tar
 
 ^^^^
 
+
+h
 # 1. Группы
 sudo groupadd Work
 sudo groupadd Job
