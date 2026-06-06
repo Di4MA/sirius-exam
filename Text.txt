@@ -1,2 +1,24 @@
 cd /root
 sudo docker load -i nex.tar
+
+^^^^
+
+# 1. Группы
+sudo groupadd Work
+sudo groupadd Job
+sudo groupadd labor
+
+# 2. Пользователи (с основной доп. группой)
+sudo useradd -m -G Work  User1
+sudo useradd -m -G Work  User2
+sudo useradd -m -G Job   User3
+sudo useradd -m -G Job   User4
+sudo useradd -m -G labor User5
+
+# 3-4. Каталоги и права
+sudo mkdir -p /home/Folder/work_shared /home/Folder/job_readonly
+sudo chmod 755 /home/Folder
+sudo chown root:Work /home/Folder/work_shared
+sudo chmod 770       /home/Folder/work_shared
+sudo chown root:Job  /home/Folder/job_readonly
+sudo chmod 750       /home/Folder/job_readonly
